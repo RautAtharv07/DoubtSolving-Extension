@@ -92,7 +92,6 @@ uvicorn main:app --reload
         ```json
         "host_permissions": [
           "http://127.0.0.1:8000/*"
-          // "https://my-rag-scraper-api.onrender.com/*"
         ],
         ```
 
