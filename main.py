@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, HttpUrl
 import uuid
-
+from fastapi.middleware.cors import CORSMiddleware
 # Import our system components
 from scraper import scrape_text_from_url
 from rag_system import RAGSystem
@@ -12,6 +12,13 @@ app = FastAPI(
     version="1.0.0"
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins (for public API)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods (GET, POST, OPTIONS, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
 # In-memory storage for our RAG sessions (for demo purposes)
 chat_sessions = {}
 
