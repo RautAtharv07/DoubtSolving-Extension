@@ -1,5 +1,4 @@
 # DoubtSolving-Extension
-[![Ask DeepWiki](https://devin.ai/assets/askdeepwiki.png)](https://deepwiki.com/RautAtharv07/DoubtSolving-Extension.git)
 
 This project is a browser extension that allows users to ask questions about the content of the current webpage. It scrapes the page, processes the text using a Retrieval Augmented Generation (RAG) system powered by Together.ai, and provides a chat interface within the extension popup to interact with the page's content.
 
