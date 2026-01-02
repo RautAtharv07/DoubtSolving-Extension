@@ -8,16 +8,18 @@ from rag_system import RAGSystem
 
 app = FastAPI(
     title="Custom RAG Chat API",
-    description="An API to scrape a webpage and chat with its content using Together.ai.",
+    description="An API to scrape a webpage and chat with its content using Google Gemini AI.",
     version="1.0.0"
 )
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allows all origins (for public API)
-    allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods (GET, POST, OPTIONS, etc.)
-    allow_headers=["*"],  # Allows all headers
+    allow_credentials=False,  # Set to False for wildcard origins
+    allow_methods=["GET", "POST", "OPTIONS"],  # Explicitly list methods
+    allow_headers=["Content-Type", "Accept", "Authorization"],  # Explicitly list headers
+    expose_headers=["*"],
+    max_age=3600,
 )
 # In-memory storage for our RAG sessions (for demo purposes)
 chat_sessions = {}

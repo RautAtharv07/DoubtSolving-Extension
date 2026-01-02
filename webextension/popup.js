@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendBtn = document.getElementById('send-btn');
     const statusDiv = document.getElementById('status');
 
-    const API_INDEX_URL = 'https://my-rag-scraper-api.onrender.com/scrape-and-index';
-    const API_CHAT_URL = 'https://my-rag-scraper-api.onrender.com/chat';
+    const API_INDEX_URL = 'http://127.0.0.1:8000/scrape-and-index';
+    const API_CHAT_URL = 'http://127.0.0.1:8000/chat';
     
     let currentSessionId = null;
 
@@ -47,10 +47,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Immediately start indexing the current page when the popup opens
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs[0] && tabs[0].url) {
-            startIndexing(tabs[0].url);
+    // Get current tab URL from background script
+    chrome.runtime.sendMessage({ action: "getCurrentTabUrl" }, (response) => {
+        if (response && response.url) {
+            console.log('Current URL:', response.url);
+            startIndexing(response.url);
         } else {
             statusDiv.textContent = 'Could not get current tab URL.';
         }

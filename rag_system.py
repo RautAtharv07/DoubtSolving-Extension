@@ -3,26 +3,19 @@ import faiss
 from sentence_transformers import SentenceTransformer
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
-# --- IMPORT THE NEW OPENAI CLIENT ---
-from openai import OpenAI
-# ------------------------------------
 import os
 from dotenv import load_dotenv
+from google import genai
+from google.genai import types
 
 # Load API Key from .env file
 load_dotenv()
-API_KEY = os.getenv("TOGETHER_API_KEY")
+API_KEY = os.getenv("GEMINI_API_KEY")
 if not API_KEY:
-    raise ValueError("TOGETHER_API_KEY not found in .env file. Please add it.")
+    raise ValueError("GEMINI_API_KEY not found in .env file. Please add it.")
 
-# --- CREATE THE NEW CLIENT OBJECT ---
-# This is the main change for the new version.
-# We pass the api_key and base_url when we create the client.
-client = OpenAI(
-    api_key=API_KEY,
-    base_url="https://api.together.xyz/v1",
-)
-# ------------------------------------
+# Configure Gemini API
+client = genai.Client(api_key=API_KEY)
 
 class RAGSystem:
     def __init__(self, raw_text: str):
@@ -54,7 +47,7 @@ class RAGSystem:
         return [self.docs[i] for i in indices[0]]
 
     def _generate_answer(self, context: str, query: str):
-        print("Generating answer with LLM using new openai v1.0+ syntax...")
+        print("Generating answer with Gemini AI...")
         prompt = f"""Use the provided context below to answer the user's question. If the context doesn't contain the answer, state that you cannot answer based on the information provided.
 
 Context:
@@ -66,21 +59,17 @@ Question:
 Answer:"""
 
         try:
-            # --- THIS IS THE NEW SYNTAX FOR MAKING THE API CALL ---
-            response = client.chat.completions.create(
-                model="mistralai/Mistral-7B-Instruct-v0.2",
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant that answers questions based only on the given context."},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=512,
-                temperature=0.7
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    temperature=0.7,
+                    max_output_tokens=512,
+                )
             )
-            # The response object is also different. We access the content like this:
-            return response.choices[0].message.content
-            # --------------------------------------------------------
+            return response.text
         except Exception as e:
-            print(f"Error calling LLM API: {e}")
+            print(f"Error calling Gemini API: {e}")
             return "There was an error communicating with the language model."
 
     def answer_question(self, query: str):
@@ -90,4 +79,5 @@ Answer:"""
         relevant_docs = self._retrieve(query)
         combined_context = "\n\n".join([doc.page_content for doc in relevant_docs])
         answer = self._generate_answer(combined_context, query)
+        print(answer)
         return answer
